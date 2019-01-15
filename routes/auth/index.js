@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../db/models/user')
-const passport = require('../passport')
+const User = require('../../db/models/user')
+const passport = require('../../passport')
 
 router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
-router.get(
-	'/google/callback',
+
+router.get('/google/callback',
 	passport.authenticate('google', {
-		successRedirect: '/',
-		failureRedirect: '/login'
+		successRedirect: 'http://localhost:3000',
+		failureRedirect: 'http://localhost:3000/login'
 	})
 )
 
@@ -21,6 +21,20 @@ router.get('/user', (req, res, next) => {
 	} else {
 		return res.json({ user: null })
 	}
+})
+
+router.get('/user/:id', (req, res, next) => {
+	console.log('===== user!!======')
+	const id = req.params.id;
+	User.findOne({
+		'_id': id
+	}, (err, userMatch) => {
+		if (userMatch) {
+			res.json(userMatch)
+		}else{
+			res.json({"ERROR": "NO MATCH"})
+		}
+	})
 })
 
 router.post(
