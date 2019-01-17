@@ -3,14 +3,13 @@ const router = express.Router()
 const User = require('../../db/models/user')
 const passport = require('../../passport')
 
-router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
+// router.get('/google', passport.authenticate('google', { scope: ['profile'] }))
 
-router.get('/google/callback',
-	passport.authenticate('google', {
-		successRedirect: 'http://localhost:3000',
-		failureRedirect: 'http://localhost:3000/login'
-	})
-)
+// router.get('/google/callback',
+// 	passport.authenticate('google', {
+// 		successRedirect: 'http://localhost:3000',
+// 		failureRedirect: 'http://localhost:3000/login'
+// 	}))
 
 // this route is just used to get the user basic info
 router.get('/user', (req, res, next) => {
@@ -53,6 +52,7 @@ router.post(
 			console.log(`Deleting ${cleanUser.local.password}`)
 			delete cleanUser.local.password
 		}
+		console.log(cleanUser)
 		res.json({ user: cleanUser })
 	}
 )
@@ -68,7 +68,8 @@ router.post('/logout', (req, res) => {
 })
 
 router.post('/signup', (req, res) => {
-	const { username, password } = req.body
+	const { username, password, firstName, lastName, photo } = req.body
+	console.log("REQ.BODY: ", req.body)
 	// ADD VALIDATION
 	User.findOne({ 'local.username': username }, (err, userMatch) => {
 		if (userMatch) {
@@ -78,7 +79,10 @@ router.post('/signup', (req, res) => {
 		}
 		const newUser = new User({
 			'local.username': username,
-			'local.password': password
+			'local.password': password,
+			firstName,
+			lastName,
+			photo
 		})
 		newUser.save((err, savedUser) => {
 			if (err) return res.json(err)
